@@ -45,6 +45,7 @@ function setupSoftware() {
 
     sudo snap install spotify &> ${ERROR_LOG}
 
+    # shotwell
     # jetbrains toolbox
     # jetbrains rider
     # proprietary codecs
@@ -60,6 +61,7 @@ function setupSoftLinks() {
     ln -fs "$PWD/.bash_prompt" ~/.bash_prompt
     ln -fs "$PWD/.bashrc" ~/.bashrc
     ln -fs "$PWD/.exports" ~/.exports
+    ln -fs "$PWD/.functions" ~/.functions
     ln -fs "$PWD/.gitconfig" ~/.gitconfig
     ln -fs "$PWD/Code/settings.json" ~/.config/Code/User/settings.json;
 

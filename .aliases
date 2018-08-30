@@ -1,1 +1,4 @@
+#!/bin/bash
+
+# Always use colour output for ls
 alias ls="ls --color=auto"
