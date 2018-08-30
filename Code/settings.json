@@ -4,7 +4,7 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.renderWhitespace": "boundary",
-    "workbench.colorTheme": "Arc+",
+    "workbench.colorTheme": "Arc+ (Light)",
     "workbench.iconTheme": "material-icon-theme",
     "workbench.startupEditor": "newUntitledFile",
     "workbench.statusBar.feedback.visible": false,

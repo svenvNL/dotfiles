@@ -1,6 +1,12 @@
 # Sven's Dotfiles
 These dotfiles are inspired by:
-- [Mathias Bynens dotfiles](https://github.com/mathiasbynens/dotfiles)
+- [Mathias Bynens' dotfiles](https://github.com/mathiasbynens/dotfiles)
+- [Matt Gaunt's dotfiles](https://github.com/gauntface/dotfiles)
 
-## 
-The [install script](./scripts/install.sh) is made for [Fedora](https://getfedora.org/). You'll want to edit this file if you are not using Fedora.
+## Installation
+These scripts should be Linux agnostic exlcuding the `setupSoftware` function in [setup.sh](./setup.sh). `setupSoftware` is written for [Fedora Workstation](http://getfedora.org).
+
+To get started, run the following command:
+```bash
+bash <(curl -s "https://raw.githubusercontent.com/svenvNL/dotfiles/master/bootstrap.sh?$(date +%s)")
+```
