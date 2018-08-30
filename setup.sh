@@ -75,7 +75,7 @@ function setupGit() {
     read -p "Name": GIT_NAME
 
     GIT_CONFIG='[user]\n'
-	GIT_CONFIG+="email = ${GIT_EMAIL}\n"
+    GIT_CONFIG+="email = ${GIT_EMAIL}\n"
     GIT_CONFIG+="name = ${GIT_NAME}"
     echo -e ${GIT_CONFIG} > "${HOME}/.gitconfig.local"
 
