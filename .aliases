@@ -1,4 +1,15 @@
 #!/bin/bash
 
+# Easier navigation: .., ..., ~ and -
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+alias .....='cd ../../../..'
+alias ~='cd ~' # `cd` is probably faster to type though
+
+# Shortcuts
+alias d='cd ~/Downloads'
+alias p='cd ~/Projects'
+
 # Always use colour output for ls
 alias ls="ls --color=auto"
