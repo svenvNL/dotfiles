@@ -15,7 +15,20 @@ function setupXClip() {
 }
 
 function setupSSHKeys() {
-    bash "${DOTFILES_DIR}/apache_license_bootstrap.sh"
+    if [ ! -f "${HOME}/.ssh/id_rsa" ]; then
+        read -p "Enter email for Github SSH key": GITHUB_EMAIL
+        ssh-keygen -t rsa -b 4096 -C "${GITHUB_EMAIL}"
+        
+        # Start SSH-Agent
+        eval "$(ssh-agent -s)"
+        
+        # Add key
+        ssh-add "${HOME}/.ssh/id_rsa"
+    fi
+    
+    xclip -sel clip < "${HOME}/.ssh/id_rsa.pub"
+    
+    read -p "Public key is coppied to the clipboard, press enter to continue"
 }
 
 function cloneRepo() {
