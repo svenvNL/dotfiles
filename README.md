@@ -10,7 +10,7 @@ bash <(curl -s "https://raw.githubusercontent.com/svenvNL/dotfiles/master/bootst
 ```
 
 ## License
-All files in this repository are licensed under the [MIT license](./LICENSE.md).
+All files in this repository are licensed under the [MIT license](./LICENSE).
 
 ## Thanks to
 - [Mathias Bynens](https://github.com/mathiasbynens) for sharing his [dotfiles repository](https://github.com/mathiasbynens/dotfiles)
