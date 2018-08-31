@@ -30,14 +30,9 @@ function setupSoftware() {
     sudo dnf -y install fira-code-fonts
     sudo dnf -y install papirus-icon-theme
     sudo dnf -y install google-chrome-stable
+    sudo dnf -y install shotwell
     
     sudo snap install spotify
-    
-    # shotwell
-    # jetbrains toolbox
-    # jetbrains rider
-    # proprietary codecs
-    # fat32
 }
 
 function setupNodePackages() {
