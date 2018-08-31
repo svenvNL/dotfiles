@@ -15,10 +15,10 @@ function initLogFile() {
 function setupDirectories() {
     PROJECTS_DIR="${HOME}/Projects"
     DOTFILES_DIR="${PROJECTS_DIR}/dotfiles"
-
+    
     echo -e "📂  Setting up directories..."
     echo -e "\tProjects:\t${PROJECTS_DIR}"
-
+    
     mkdir -p ${PROJECTS_DIR}
 }
 
@@ -27,18 +27,7 @@ function setupXClip() {
 }
 
 function setupSSHKeys() {
-    echo -e "\n🔑  Setting up SSH Key..."
-    if [ ! -f "${HOME}/.ssh/id_rsa" ] ; then
-        read -p "email": SSH_EMAIL
-        ssh-keygen -t rsa -b 4096 -C "${SSH_EMAIL}"
-        eval "$(ssh-agent -s)" &> ${ERROR_LOG}
-        ssh-add ~/.ssh/id_rsa
-    fi
-
-    xclip -sel clip < ~/.ssh/id_rsa.pub
-
-    echo -e "\t📋  Your SSH key has been copied to your clipboard, please add it to https://github.com/settings/keys"
-    read -p "Press enter to continue"
+    bash "${DOTFILES_DIR}/apache_license_bootstrap.sh"
 }
 
 function cloneRepo() {
