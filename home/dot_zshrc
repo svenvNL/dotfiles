@@ -1,0 +1,37 @@
+# Performance optimizations
+DISABLE_AUTO_UPDATE="true"
+DISABLE_MAGIC_FUNCTIONS="true"
+DISABLE_COMPFIX="true"
+
+# Oh My Zsh path
+export ZSH="$HOME/.oh-my-zsh"
+# Outside $ZSH: chezmoi manages that directory exactly (see .chezmoiexternal.toml)
+export ZSH_CACHE_DIR="$HOME/.cache/oh-my-zsh"
+
+# Oh My Zsh plugins
+plugins=(dnf git ssh starship uv volta)
+
+# Source Oh My Zsh
+source $ZSH/oh-my-zsh.sh
+
+# Cargo
+. "$HOME/.cargo/env"
+
+# UV
+export UV_KEYRING_PROVIDER=subprocess
+export UV_PROJECT_ENVIRONMENT=venv
+export UV_VENV_SEED=true
+
+# node
+export NODE_OPTIONS="--max_old_space_size=4096"
+
+# Layered drop-ins (e.g. the private work layer) live here
+if [[ -d ~/.config/zsh/conf.d ]]; then
+    for rc in ~/.config/zsh/conf.d/*.zsh(N); do
+        source "$rc"
+    done
+    unset rc
+fi
+
+# Source aliases last
+[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases

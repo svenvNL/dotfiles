@@ -1,0 +1,105 @@
+[user]
+	name = {{ .name }}
+	email = {{ .email }}
+	# Personal key; the private half stays on the machine (not in this repo).
+	# Signing uses it through the ssh-agent.
+	signingkey = ~/.ssh/id_ed25519_personal.pub
+
+# --- Signing: every commit and tag with the key above ---
+# Layers can override this for their own repos (e.g. a work layer can sign
+# with a work key under its own directory, via work.gitconfig).
+[gpg]
+	format = ssh
+
+[gpg "ssh"]
+	# Lets `git log --show-signature` / `git verify-commit` verify our own signatures
+	allowedSignersFile = ~/.config/git/allowed_signers
+
+[commit]
+	gpgsign = true
+
+[tag]
+	gpgsign = true
+
+# --- Behaviour ---
+[core]
+	excludesfile = ~/.gitignore
+	autocrlf = input
+    pager = delta
+
+[init]
+	defaultBranch = main
+
+[interactive]
+    diffFilter = delta --color-only
+
+[fetch]
+	prune = true
+	pruneTags = true
+	all = true
+
+[rebase]
+	autosquash = true
+	autoStash = true
+	updateRefs = true
+
+[delta]
+    navigate = true
+
+[merge]
+    conflictStyle = zdiff3
+
+[merge "mergiraf"]
+    name = mergiraf
+    driver = mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P -l %L
+
+[push]
+	autoSetupRemote = true
+	followTags = true
+
+[rerere]
+	enabled = true
+
+# --- Colors ---
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold
+	old = red
+	new = green
+
+[color "status"]
+	added = yellow
+	changed = green
+	untracked = cyan
+
+# --- Aliases ---
+[alias]
+	# Delete local branches merged into HEAD, keeping the current, checked-out and main branches
+	cleanup = "!git branch --merged | grep -vE '^[*+]|^  (main|master|develop)$' | xargs -r git branch -d"
+
+	# Stacks: https://andrewlock.net/pushing-a-whole-stack-of-branches-with-a-single-git-command/
+	default-branch = "!git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@'"
+	merge-base-origin = "!f() { git merge-base ${1-HEAD} origin/$(git default-branch); }; f"
+	stack = "!f() { \
+		BRANCH=${1-HEAD}; \
+		MERGE_BASE=$(git merge-base-origin $BRANCH); \
+		git log --decorate-refs=refs/heads --simplify-by-decoration --pretty=format:\"%(decorate:prefix=,suffix=,tag=,separator=%n)\" $MERGE_BASE..$BRANCH; \
+	}; f"
+	push-stack = "!f() { \
+		BRANCH=${1-HEAD}; \
+		git stack $BRANCH | xargs -I {} git push --force-with-lease origin {}; \
+	}; f"
+
+# --- Layering ---
+# Provided by the private work layer (a missing file is ignored by git)
+[include]
+	path = ~/.config/git/work.gitconfig
+
+# Machine-local overrides, unmanaged. Last, so it wins.
+[include]
+	path = ~/.gitconfig.local

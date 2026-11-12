@@ -1,0 +1,4 @@
+command = /bin/zsh
+window-theme = system
+theme = Tomorrow
+shell-integration = zsh

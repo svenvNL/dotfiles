@@ -1,0 +1,9 @@
+{{- /* Base layer config. Prompts once per machine; answers live in ~/.config/chezmoi/chezmoi.toml */ -}}
+{{- $name := promptStringOnce . "name" "Git user name" -}}
+{{- $email := promptStringOnce . "email" "Default git email (personal)" -}}
+
+sourceDir = {{ .chezmoi.workingTree | quote }}
+
+[data]
+    name = {{ $name | quote }}
+    email = {{ $email | quote }}
