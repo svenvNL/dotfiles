@@ -1,0 +1,77 @@
+#!/bin/bash
+# System-level software from .chezmoidata/packages.yaml: dnf repos + packages, login shell,
+# Docker, Flathub + flatpaks.
+# chezmoi reruns this whenever the rendered script (i.e. the package list) changes.
+# Only installs what is missing; never uninstalls. sudo is only asked for when needed.
+set -euo pipefail
+
+{{ if eq .chezmoi.osRelease.id "fedora" -}}
+# --- dnf plugins (copr, config-manager) ---
+rpm -q dnf5-plugins &>/dev/null || sudo dnf install -y dnf5-plugins
+
+# --- dnf repositories ---
+{{ range .packages.fedora.copr -}}
+if ! dnf repolist --enabled 2>/dev/null | grep -q "^copr:copr.fedorainfracloud.org:{{ . | replace "/" ":" }} "; then
+    sudo dnf copr enable -y {{ . | quote }}
+fi
+{{ end -}}
+{{ range .packages.fedora.enableRepos -}}
+if ! dnf repolist --enabled 2>/dev/null | grep -q "^{{ . }} "; then
+    sudo dnf config-manager setopt {{ . | quote }}.enabled=1
+fi
+{{ end -}}
+{{ range .packages.fedora.repoFiles -}}
+if [ ! -f /etc/yum.repos.d/{{ .name }}.repo ]; then
+    sudo dnf config-manager addrepo --from-repofile={{ .url | quote }}
+fi
+{{ end }}
+# --- dnf packages ---
+missing=()
+for p in {{ .packages.fedora.dnf | join " " }}; do
+    rpm -q "$p" &>/dev/null || missing+=("$p")
+done
+if (( ${#missing[@]} )); then
+    echo "==> dnf install ${missing[*]}"
+    sudo dnf install -y "${missing[@]}"
+fi
+
+# --- Docker: service running at boot, usable without sudo ---
+if rpm -q docker-ce &>/dev/null; then
+    systemctl is-enabled -q docker || sudo systemctl enable docker
+    systemctl is-active -q docker || sudo systemctl start docker
+    if ! id -nG "$USER" | grep -qw docker; then
+        sudo usermod -aG docker "$USER"
+        echo "==> Added $USER to the docker group: log out and back in to use docker without sudo"
+    fi
+fi
+{{ end -}}
+
+# --- Login shell: zsh ---
+# Compare resolved paths: /bin/zsh and /usr/bin/zsh are the same binary on Fedora
+zsh_path="$(command -v zsh || true)"
+current_shell="$(getent passwd "$USER" | cut -d: -f7)"
+if [ -n "$zsh_path" ] && [ "$(readlink -f "$current_shell")" != "$(readlink -f "$zsh_path")" ]; then
+    echo "==> Setting login shell to $zsh_path"
+    sudo usermod --shell "$zsh_path" "$USER"
+fi
+
+# --- Flathub (system-wide): present, enabled, unfiltered ---
+if command -v flatpak >/dev/null; then
+    flathub="$(flatpak remotes --system --columns=name,options,filter | awk -F'\t' '$1 == "flathub"')"
+    if [ -z "$flathub" ]; then
+        echo "==> Adding Flathub"
+        sudo flatpak remote-add --system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    else
+        if awk -F'\t' '{print $2}' <<<"$flathub" | grep -qw disabled; then
+            echo "==> Enabling Flathub"
+            sudo flatpak remote-modify --system --enable flathub
+        fi
+        if [ "$(awk -F'\t' '{print $3}' <<<"$flathub")" != "-" ]; then
+            echo "==> Removing Flathub filter"
+            sudo flatpak remote-modify --system --no-filter flathub
+        fi
+    fi
+    for app in {{ .packages.flatpak | join " " }}; do
+        flatpak info "$app" &>/dev/null || sudo flatpak install --system -y --noninteractive flathub "$app"
+    done
+fi

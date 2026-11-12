@@ -1,0 +1,47 @@
+# Software for the base (personal) layer.
+# Installed by .chezmoiscripts/run_onchange_after_{10-system,30-user}-packages.sh.tmpl,
+# which reruns whenever this file changes. Removing an entry does NOT uninstall it.
+# Oh My Zsh, uv and Volta are chezmoi externals (.chezmoiexternal.toml); rustup, Claude Code and
+# JetBrains Toolbox are bootstrapped by run_once_after_20-install-toolchains.sh.
+packages:
+  fedora:
+    copr:
+      - atim/starship
+      - scottames/ghostty
+    # Repos shipped disabled by fedora-workstation-repositories, to enable
+    enableRepos: []
+    repoFiles:
+      - name: docker-ce
+        url: https://download.docker.com/linux/fedora/docker-ce.repo
+    dnf:
+      - chezmoi
+      - ghostty
+      - git-absorb
+      - git-delta
+      - iftop
+      - netcat
+      - starship
+      - trash-cli
+      - yq
+      - zsh
+      # Docker
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-ce
+      - docker-ce-cli
+      - docker-compose-plugin
+
+  flatpak:
+    - app.zen_browser.zen
+    - io.github.nozwock.Packet
+
+  cargo:
+    - cargo-binstall
+    - cargo-update
+    - mergiraf
+    - miniserve
+    - xh
+
+  uv:
+    - keyring
+    - pre-commit

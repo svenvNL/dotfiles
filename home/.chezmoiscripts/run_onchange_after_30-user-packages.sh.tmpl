@@ -1,0 +1,26 @@
+#!/bin/bash
+# User-level tools from .chezmoidata/packages.yaml (cargo, uv). Runs after the toolchain installers.
+# chezmoi reruns this whenever the rendered script (i.e. the package list) changes.
+# Only installs what is missing; never uninstalls.
+set -euo pipefail
+
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+
+# --- cargo ---
+if command -v cargo >/dev/null; then
+    installed="$(cargo install --list)"
+    if ! grep -q '^cargo-binstall ' <<<"$installed"; then
+        cargo install cargo-binstall
+    fi
+    for c in {{ .packages.cargo | join " " }}; do
+        grep -q "^$c " <<<"$installed" || cargo binstall -y "$c"
+    done
+fi
+
+# --- uv tools ---
+if command -v uv >/dev/null; then
+    # Check the executable, not just uv's tool list: a half-finished install can be listed without one
+    for t in {{ .packages.uv | join " " }}; do
+        command -v "$t" >/dev/null || uv tool install --force "$t"
+    done
+fi

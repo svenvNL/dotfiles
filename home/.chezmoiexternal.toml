@@ -1,0 +1,40 @@
+# Third-party files managed by chezmoi itself: downloaded on apply, refreshed weekly
+# (or on demand with `chezmoi apply --refresh-externals`). This file is a template.
+{{- $uvArch := "x86_64" }}
+{{- if eq .chezmoi.arch "arm64" }}{{ $uvArch = "aarch64" }}{{ end }}
+{{- $voltaVersion := "2.0.2" }}
+{{- $voltaSuffix := "linux" }}
+{{- if eq .chezmoi.arch "arm64" }}{{ $voltaSuffix = "linux-arm" }}{{ end }}
+
+# Oh My Zsh. exact: files dropped upstream are removed too; runtime cache lives in
+# $ZSH_CACHE_DIR (~/.cache/oh-my-zsh, see dot_zshrc) so it survives applies.
+[".oh-my-zsh"]
+    type = "archive"
+    url = "https://github.com/ohmyzsh/ohmyzsh/archive/master.tar.gz"
+    exact = true
+    stripComponents = 1
+    refreshPeriod = "168h"
+
+{{ if eq .chezmoi.os "linux" -}}
+# uv / uvx: single static binaries from the latest GitHub release
+[".local/bin/uv"]
+    type = "archive-file"
+    url = "https://github.com/astral-sh/uv/releases/latest/download/uv-{{ $uvArch }}-unknown-linux-gnu.tar.gz"
+    path = "uv-{{ $uvArch }}-unknown-linux-gnu/uv"
+    executable = true
+    refreshPeriod = "168h"
+
+[".local/bin/uvx"]
+    type = "archive-file"
+    url = "https://github.com/astral-sh/uv/releases/latest/download/uv-{{ $uvArch }}-unknown-linux-gnu.tar.gz"
+    path = "uv-{{ $uvArch }}-unknown-linux-gnu/uvx"
+    executable = true
+    refreshPeriod = "168h"
+
+# Volta: just the binaries (volta, volta-shim, volta-migrate) into ~/.volta/bin. Not exact:
+# that directory also holds the shims volta creates. No stable "latest" asset name, so the
+# version is pinned above; bump it to upgrade. Runtimes are installed by layers on top.
+[".volta/bin"]
+    type = "archive"
+    url = "https://github.com/volta-cli/volta/releases/download/v{{ $voltaVersion }}/volta-{{ $voltaVersion }}-{{ $voltaSuffix }}.tar.gz"
+{{ end -}}
