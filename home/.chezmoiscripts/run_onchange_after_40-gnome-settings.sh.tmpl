@@ -1,0 +1,15 @@
+{{ if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# Applies curated GNOME settings from .chezmoitemplates/dconf.ini.
+# Reruns when that file changes. Only the listed keys are set; everything else is left alone.
+set -euo pipefail
+
+if ! command -v dconf >/dev/null || [ -z "${DBUS_SESSION_BUS_ADDRESS:-}" ]; then
+    echo "==> Skipping GNOME settings: no dconf or no desktop session"
+    exit 0
+fi
+
+dconf load / <<'EOF'
+{{ template "dconf.ini" . }}
+EOF
+{{ end -}}
